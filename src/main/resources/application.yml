@@ -1,0 +1,25 @@
+spring:
+  r2dbc:
+    url: ${SPRING_R2DBC_URL}
+    username: ${SPRING_R2DBC_USERNAME}
+    password: ${SPRING_R2DBC_PASSWORD}
+  flyway:
+    url: ${SPRING_FLYWAY_URL}
+    user: ${SPRING_FLYWAY_USER}
+    password: ${SPRING_FLYWAY_PASSWORD}
+    enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:-localhost}
+    port: 5672
+
+minio:
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ocorrencias
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
