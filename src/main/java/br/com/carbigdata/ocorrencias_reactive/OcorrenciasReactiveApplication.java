@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OcorrenciasReactiveApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OcorrenciasReactiveApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OcorrenciasReactiveApplication.class, args);
+    }
 
 }
