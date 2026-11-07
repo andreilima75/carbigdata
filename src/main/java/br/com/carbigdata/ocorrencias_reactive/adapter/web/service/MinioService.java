@@ -7,6 +7,7 @@ import io.minio.PutObjectArgs;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
 import io.minio.errors.XmlParserException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 
 @Service
+@Slf4j
 public class MinioService {
 
     private final MinioAsyncClient minioAsyncClient;
@@ -99,7 +101,7 @@ public class MinioService {
                 )
                 .thenReturn(fileName)
                 .doOnNext(name ->
-                        System.out.println("Upload via stream concluído: " + name));
+                        log.info("Upload via stream concluído: {}", name));
     }
 
     private Mono<Void> createBucketIfNotExistsReactive() {
@@ -137,7 +139,7 @@ public class MinioService {
     }
 
     private String generateFileName(String originalFileName) {
-        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String extension = getExtension(originalFileName);
         return System.currentTimeMillis() + "_" + java.util.UUID.randomUUID() + extension;
     }
 

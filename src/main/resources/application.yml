@@ -1,10 +1,10 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://db:5432/carbigdata
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/carbigdata}
     username: postgres
     password: postgres
   rabbitmq:
-    host: rabbitmq
+    host: ${RABBITMQ_HOST:localhost}
     port: 5672
     username: guest
     password: guest
@@ -19,15 +19,15 @@ spring:
       mandatory: true
 
   flyway:
-    url: jdbc:postgresql://db:5432/carbigdata
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/carbigdata}
     user: postgres
     password: postgres
     enabled: true
 
 minio:
-  url: http://minio:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
+  url: ${MINIO_URL:http://localhost:9000}
+  accessKey: ${MINIO_ACCESS_KEY:minioadmin}
+  secretKey: ${MINIO_SECRET_KEY:minioadmin}
   bucketName: ocorrencias
 
 management:

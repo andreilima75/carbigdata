@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux;
 
 public interface OcorrenciaRepository extends ReactiveCrudRepository<Ocorrencia, Long> {
 
-    Flux<Ocorrencia> findAllByOrderByDtaOcorrenciaDesc();
+    Flux<Ocorrencia> findAllBy(Pageable pageable);
 
     Flux<Ocorrencia> findByStaOcorrenciaOrderByDtaOcorrenciaDesc(
             StatusOcorrencia status, Pageable pageable);
