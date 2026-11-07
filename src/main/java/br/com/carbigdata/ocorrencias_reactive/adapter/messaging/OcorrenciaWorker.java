@@ -10,10 +10,12 @@ import br.com.carbigdata.ocorrencias_reactive.domain.model.FotoOcorrencia;
 import br.com.carbigdata.ocorrencias_reactive.domain.model.Ocorrencia;
 import br.com.carbigdata.ocorrencias_reactive.domain.model.StatusOcorrencia;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -26,8 +28,10 @@ public class OcorrenciaWorker {
     private final EnderecoRepository enderecoRepository;
     private final OcorrenciaRepository ocorrenciaRepository;
     private final FotoOcorrenciaRepository fotoOcorrenciaRepository;
+    private final TransactionalOperator tx;
 
-    public OcorrenciaWorker(ClienteRepository clienteRepository, EnderecoRepository enderecoRepository, OcorrenciaRepository ocorrenciaRepository, FotoOcorrenciaRepository fotoOcorrenciaRepository) {
+    public OcorrenciaWorker(ClienteRepository clienteRepository, EnderecoRepository enderecoRepository, OcorrenciaRepository ocorrenciaRepository, FotoOcorrenciaRepository fotoOcorrenciaRepository, TransactionalOperator tx) {
+        this.tx = tx;
         this.clienteRepository = clienteRepository;
         this.enderecoRepository = enderecoRepository;
         this.ocorrenciaRepository = ocorrenciaRepository;
@@ -47,13 +51,13 @@ public class OcorrenciaWorker {
                 .publishOn(Schedulers.parallel())
                 .map(msg -> {
                     try {
-                        String json = new String(msg.getBody());
+                        String json = new String(msg.getBody(), StandardCharsets.UTF_8);
                         return mapper.readValue(json, OcorrenciaRecebida.class);
                     } catch (Exception e) {
                         throw new RuntimeException("Erro no parse", e);
                     }
                 })
-                .flatMap(this::processarOcorrencia)
+                .flatMap(evento -> processarOcorrencia(evento).as(tx::transactional))
                 .doOnSuccess(v -> {
                     try {
                         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

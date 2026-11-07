@@ -8,7 +8,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -116,6 +118,8 @@ public class IngestaoOcorrenciaService {
 
     public Mono<Void> publicarOcorrenciaComMono(OcorrenciaRequestDTO dto, Mono<FilePart> fotoPartMono) {
         return fotoPartMono
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "A parte 'foto' é obrigatória")))
                 .flatMap(fotoPart -> publicarOcorrencia(dto, fotoPart))
                 .then();
     }
